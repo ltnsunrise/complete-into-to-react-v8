@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import fetchPet from "./ fetchPet";
 import Carousel from "./Carousel";
 import Modal from "./Modal";
+import ErrorBoundary from "./ErrorBoundary";
 
 const Details = () => {
   const { id } = useParams();
@@ -45,4 +46,10 @@ const Details = () => {
   );
 };
 
-export default Details;
+export default function DetailsErrorBoundary(props) {
+  return (
+    <ErrorBoundary>
+      <Details {...props} />
+    </ErrorBoundary>
+  );
+}
