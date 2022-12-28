@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { useAdoptedPetContext } from "../contexts/AdoptedPetContext";
 import fetchSearch from "./ fetchSearch";
 import Results from "./Results";
 import useBreedList from "./useBreedList";
 
 const ANIMALS = ["bird", "cat", "dog", "rabbit", "reptile"];
+
+// * Imagine if we had three hundred pets to render: that actually could take a while. And if in the mean time a user clicked a button to adopt a pet or re-search for something else, we'd want to drop rendering other pets and focus on what the user asked for.
 
 const SearchParams = () => {
   const [requestParams, setRequestParams] = useState({
@@ -18,6 +20,11 @@ const SearchParams = () => {
 
   const results = useQuery(["search", requestParams], fetchSearch);
   const pets = results?.data?.pets ?? [];
+  const deferredPets = useDeferredValue(pets);
+  const renderedPets = useMemo(
+    () => <Results pets={deferredPets} />,
+    [deferredPets]
+  );
 
   return (
     <div className="search-params">
@@ -68,7 +75,7 @@ const SearchParams = () => {
         </label>
         <button>Submit</button>
       </form>
-      <Results pets={pets} />
+      {renderedPets}
     </div>
   );
 };
